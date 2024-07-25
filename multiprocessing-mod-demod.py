@@ -7,7 +7,7 @@ import zfec
 import random
 import scipy
 import scipy.fft as fft
-
+import datetime
 
 # globalne promenljive
 
@@ -120,15 +120,21 @@ def mod_demod_loop(noise):
 
 from multiprocessing import Pool
 
+
+print(f"Starting time: {datetime.datetime.now()}")
+
 with Pool(8) as p:
-    BERs = []
+    BERs = None
     niz_snr = np.arange(1, -10, -1)
     # niz_snr = [1]
     # print(niz_snr)
-    BERs.append(p.map(mod_demod_loop,niz_snr))
+    BERs = p.map(mod_demod_loop,niz_snr)
 print(BERs)
+print(np.shape(BERs))
+bers = np.reshape(BERs, np.shape(BERs)[0] * np.shape(BERs)[1])
 
-array = np.array([[item['BER'], item['SNR']] for item in BERs[0][0]])
+
+array = np.array([[item['BER'], item['SNR']] for item in bers])
 print("Test parameters, 100 random bytes transmitted 100 times, for each SNR")
 sn_ber = []
 for snr_i in np.unique(array[:,1]):
@@ -138,8 +144,11 @@ for snr_i in np.unique(array[:,1]):
     print(f"SNR {snr_i}db, average BER over {len(ar)} samples :{np.average(ar)}")
     sn_ber.append((snr_i, np.average(ar)))
 
-plt.close()
+print(f"End time: {datetime.datetime.now()}")
+
+
 plt.clf()
 plt.plot(*zip(*sn_ber))
 plt.ylabel("BER")
 plt.xlabel("SNR[db]")
+plt.show()
