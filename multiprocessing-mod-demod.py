@@ -108,7 +108,7 @@ def BER(list1, list2, snr):
 
 def mod_demod_loop(noise):
     ber_snrs = []
-    for _ in range(100):
+    for _ in range(2):
         input_bin = GenerateRandom(8 * 100) # generisanje poruke
         signal = AddingNoise(GenerateSignal(input_bin), noise) # modulacija signala
         
